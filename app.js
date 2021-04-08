@@ -3,13 +3,48 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const connectionString =process.env.MONGO_CON
+mongoose = require('mongoose');
+mongoose.connect(connectionString, {useNewUrlParser: true, useUnifiedTopology: true});
+//Get the default connection
+var db = mongoose.connection;
+//Bind connection to error event
+db.on('error', console.error.bind(console, 'MongoDB connectionerror:'));
+db.once("open", function(){
+console.log("Connection to DB succeeded")});
+var dog = require("./models/dog");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dogRouter = require('./routes/dog');
 var starsRouter = require('./routes/stars');
 var slotRouter = require('./routes/slot');
+var resourceRouter = require('./routes/resource');
 
+
+
+// We can seed the collection if needed on server start
+async function recreateDB(){
+  // Delete everything
+  await dog.deleteMany();
+  let instance1= new dog({dogname:"mickey", age:2,breed:"shihzu"});
+  let instance2= new dog({dogname:"reno", age:3,breed:"lab"});
+  let instance3= new dog({dogname:"tommy", age:4,breed:"husky"});
+  instance1.save( function(err,doc) {
+  if(err) return console.error(err);
+  console.log("First object saved")
+  });
+  instance2.save( function(err,doc) {
+    if(err) return console.error(err);
+    console.log("Second object saved")
+  });
+  instance3.save( function(err,doc) {
+    if(err) return console.error(err);
+    console.log("Third object saved")
+  });
+}
+let reseed= true;
+if(reseed) {recreateDB();}
 
 var app = express();
 
@@ -28,6 +63,7 @@ app.use('/users', usersRouter);
 app.use('/dog', dogRouter);
 app.use('/stars', starsRouter);
 app.use('/slot', slotRouter);
+app.use('/resource', resourceRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

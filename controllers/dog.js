@@ -22,7 +22,8 @@ exports.dog_create_post = async function (req, res) {
     // We are looking for a body, since POST does not have query parameters.
     // Even though bodies can be in many different formats, we will be picky
     // and require that it be a json object
-    // {"costumetype":"goat", "cost":12, "size":"large"}
+    // {dogname:"mickey",age:"2",breed:"shihzu"}
+
     document.dogname = req.body.dogname;
     document.age = req.body.age;
     document.breed = req.body.breed;
